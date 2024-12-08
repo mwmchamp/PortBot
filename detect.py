@@ -5,9 +5,9 @@ import serial
 import time
 
 # Initialize serial communication
-serial_port = '/dev/ttyUSB0'  # Replace with your serial port
-baud_rate = 9600
-ser = serial.Serial(serial_port, baud_rate, timeout=1)
+#serial_port = '/dev/ttyUSB0'  # Replace with your serial port
+#baud_rate = 9600
+#ser = serial.Serial(serial_port, baud_rate, timeout=1)
 
 # Initialize ColorFinder
 color_finder = ColorFinder(True)  # Turn on debug mode for initial calibration
@@ -46,7 +46,7 @@ try:
 
                 # Send position over serial
                 position_data = f"{cx},{cy}\n"
-                ser.write(position_data.encode())
+                print(position_data.encode())
                 print(f"Sent: {position_data.strip()}")
 
         # Show the frame
@@ -62,4 +62,4 @@ except KeyboardInterrupt:
 finally:
     cap.release()
     cv2.destroyAllWindows()
-    ser.close()
+    #ser.close()
