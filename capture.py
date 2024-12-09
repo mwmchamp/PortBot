@@ -3,7 +3,7 @@ import os
 import time
 
 # Set up the output directory
-output_dir = "captured_images"
+output_dir = "pain"
 os.makedirs(output_dir, exist_ok=True)
 
 # Open the webcam
