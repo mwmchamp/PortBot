@@ -97,9 +97,14 @@ while True:
                 print("Target has disappeared from the frame.")
                 disappeared = True
 
+        # Exit on 'q' key
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            break
+
     # Exit on 'q' key
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
+
 
     # Set the output pin low
     GPIO.output(output_pin, GPIO.LOW)
