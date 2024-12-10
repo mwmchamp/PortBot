@@ -1,6 +1,7 @@
 import pygame
-import serial
+from serial import Serial
 import time
+from osc import PORT
 
 bottomFull = False
 numBoxes = 0
@@ -19,7 +20,7 @@ joystick = pygame.joystick.Joystick(0)
 joystick.init()
 
 # Initialize UART communication
-uart = serial.Serial('/dev/ttyUSB0', 9600)  # Adjust the port and baud rate as needed
+uart = Serial(port=PORT, baudrate=115200)  # Adjust the port and baud rate as needed
 
 def send_command_and_wait(command):
     uart.write(command)
