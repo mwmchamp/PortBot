@@ -1,2 +1,2 @@
 CAM = 0
-PORT = "COM7"
+PORT = "/dev/tty.usbserial-D30AW8QS"
