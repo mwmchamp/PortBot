@@ -21,6 +21,10 @@ joystick.init()
 # Initialize UART communication
 uart = Serial(port=PORT, baudrate=115200)  # Adjust the port and baud rate as needed
 
+def send_command(command):
+    uart.write(command.encode()+b'\n')
+    print(f"Sent: {command}")
+
 def send_command_and_wait(command):
     uart.write(command.encode()+b'\n')
     print(f"Sent: {command}")
@@ -44,17 +48,33 @@ def send_command_and_wait(command):
         return 1
 
 def travel_command(x, y):
+    # Define dead zone threshold
+    dead_zone = 0.1
+
+    # Apply dead zone to y axis
+    if abs(y) < dead_zone:
+        y = 0
+    else:
+        # Normalize y value outside dead zone
+        y = (abs(y) - dead_zone) / (1 - dead_zone) * (5 if y > 0 else -5)
 
     if y >= 0:
-        send_command_and_wait(f"FORWARD {y}")
+        send_command(f"BACK {y}")
     else:
-        send_command_and_wait(f"BACK {-y}")
+        send_command(f"FORWARD {-y}")
+
+    # Apply dead zone to x axis
+    if abs(x) < dead_zone:
+        x = 0
+    else:
+        # Normalize x value outside dead zone
+        x = (abs(x) - dead_zone) / (1 - dead_zone) * (1 if x > 0 else -1)
 
     # Map x from -1 to 1 to 90 to 150
     x_mapped = int(90 + ((x + 1) / 2) * (150 - 90))
     
     # Send the STEER command with the mapped x value
-    send_command_and_wait(f"STEER {x_mapped}")
+    send_command(f"STEER {x_mapped}")
 
     print(f"Travel command with x: {x}, y: {-y}")
 
@@ -69,9 +89,11 @@ def button_b_action():
 def button_x_action():
     global bottomFull
     print("Button X pressed")
-    if bottomFull:
-        send_command_and_wait("LIFT UP")
+    send_command_and_wait("FORWARD 1")
     send_command_and_wait("EXCHANGE IN")
+    send_command_and_wait("BACK 0")
+    send_command_and_wait("LIFT UP")
+
     bottomFull = True
 
 def button_y_action():
@@ -79,10 +101,6 @@ def button_y_action():
     print("Button Y pressed")
     if bottomFull:
         send_command_and_wait("EXCHANGE OUT")
-        send_command_and_wait("BACK 100")
-        time.sleep(1.5)
-        send_command_and_wait("FORWARD 0")
-        numBoxes -= 1
         bottomFull = False
         send_command_and_wait("LIFT DOWN")
         bottomFull = True
@@ -92,6 +110,7 @@ def button_y_action():
 
 # Main loop to handle joystick events
 running = True
+last_travel_time = time.time()
 while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -112,9 +131,12 @@ while running:
             # Assuming axis 0 is the x-axis and axis 1 is the y-axis of the left joystick
             x_axis = joystick.get_axis(0)
             y_axis = joystick.get_axis(1)
-            deadzone = 0.1  # Define a deadzone threshold
-            if abs(x_axis) > deadzone or abs(y_axis) > deadzone:
+
+            # Add delay between travel commands
+            current_time = time.time()
+            if current_time - last_travel_time >= 0.2:  # 100ms delay between commands
                 travel_command(x_axis, y_axis)
+                last_travel_time = current_time
 
 # Quit Pygame
 pygame.quit()
