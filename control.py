@@ -60,7 +60,7 @@ def travel_command(x, y):
         send_command_and_wait(f"BACK {-y}")
 
     # Map x from -1 to 1 to 90 to 150
-    x_mapped = 90 + ((x + 1) / 2) * (150 - 90)
+    x_mapped = int(90 + ((x + 1) / 2) * (150 - 90))
     
     # Send the STEER command with the mapped x value
     send_command_and_wait(f"STEER {x_mapped}")
