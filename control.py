@@ -56,7 +56,8 @@ def travel_command(x, y):
         y = 0
     else:
         # Normalize y value outside dead zone
-        y = (abs(y) - dead_zone) / (1 - dead_zone) * (5 if y > 0 else -5)
+        y = (abs(y) - dead_zone) / (1 - dead_zone) * (4 if y > 0 else -4)
+        print(y)
 
     if y >= 0:
         send_command(f"BACK {y}")
@@ -90,6 +91,7 @@ def button_x_action():
     global bottomFull
     print("Button X pressed")
     send_command_and_wait("FORWARD 1")
+    time.sleep(0.4)
     send_command_and_wait("EXCHANGE IN")
     send_command_and_wait("BACK 0")
     send_command_and_wait("LIFT UP")
@@ -134,7 +136,7 @@ while running:
 
             # Add delay between travel commands
             current_time = time.time()
-            if current_time - last_travel_time >= 0.2:  # 100ms delay between commands
+            if current_time - last_travel_time >= 0.1:  # 100ms delay between commands
                 travel_command(x_axis, y_axis)
                 last_travel_time = current_time
 
