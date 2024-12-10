@@ -1,1 +1,2 @@
 CAM = 0
+PORT = "COM7"
