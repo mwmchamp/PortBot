@@ -25,7 +25,7 @@ def process_image(input_source, model, is_webcam=False):
 
 if use_webcam:
     # Open the webcam
-    cap = cv2.VideoCapture(0)
+    cap = cv2.VideoCapture("/dev/video0")
     if not cap.isOpened():
         print("Error: Cannot access the camera.")
         exit()
