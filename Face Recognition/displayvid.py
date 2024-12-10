@@ -26,18 +26,17 @@ def display_video():
             ret, frame = False, None
 
         # If a frame is successfully captured
-        if ret:
-            # Display the frame in a window named 'Video'
-            try:
-                cv2.imshow('Video', frame)
-            except Exception as e:
-                print(f"An error occurred while displaying the frame: {e}")
-
-            # Break the loop if 'q' is pressed
-            if cv2.waitKey(1) & 0xFF == ord('q'):
+        # Display the frame in a window named 'Video'
+        try:
+            if not ret:
+                print("Failed to capture video")
                 break
-        else:
-            print("Failed to capture video")
+            cv2.imshow('Video', frame)
+        except Exception as e:
+            print(f"An error occurred while displaying the frame: {e}")
+
+        # Break the loop if 'q' is pressed
+        if cv2.waitKey(1) & 0xFF == ord('q'):
             break
 
     # Release the video capture object and close all OpenCV windows
