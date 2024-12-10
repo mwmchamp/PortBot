@@ -1,9 +1,9 @@
 import cv2
 
 def display_video():
-    # Initialize video capture with the default camera
+    # Initialize video capture with /dev/video0
     try:
-        cap = cv2.VideoCapture(0)
+        cap = cv2.VideoCapture('/dev/video0')
         print("Video capture initialized successfully.")
     except Exception as e:
         print(f"An error occurred while initializing video capture: {e}")
