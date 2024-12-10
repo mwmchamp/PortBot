@@ -4,7 +4,6 @@ import time
 from osc import PORT
 
 bottomFull = False
-numBoxes = 0
 # Initialize Pygame
 pygame.init()
 
@@ -45,14 +44,6 @@ def send_command_and_wait(command):
         return 1
 
 def travel_command(x, y):
-    # Define a deadzone threshold
-    deadzone_threshold = 0.1
-    
-    # Apply deadzone logic
-    if abs(x) < deadzone_threshold:
-        x = 0
-    if abs(y) < deadzone_threshold:
-        y = 0
 
     if y >= 0:
         send_command_and_wait(f"FORWARD {y}")
@@ -69,34 +60,32 @@ def travel_command(x, y):
 
 def button_a_action():
     print("Button A pressed")
+    send_command_and_wait("TRACK ORANGE")
 
 def button_b_action():
     print("Button B pressed")
+    send_command_and_wait("TRACK BLACK")
 
 def button_x_action():
-    global numBoxes, bottomFull
+    global bottomFull
     print("Button X pressed")
-    if numBoxes < 3:
-        if bottomFull:
-            send_command_and_wait("LIFT UP")
-        send_command_and_wait("EXCHANGE IN")
-        bottomFull = True
-        numBoxes += 1
+    if bottomFull:
+        send_command_and_wait("LIFT UP")
+    send_command_and_wait("EXCHANGE IN")
+    bottomFull = True
 
 def button_y_action():
-    global numBoxes, bottomFull
+    global bottomFull
     print("Button Y pressed")
-    if numBoxes > 0:
-        if bottomFull:
-            send_command_and_wait("EXCHANGE OUT")
-            send_command_and_wait("BACK 100")
-            time.sleep(1.5)
-            send_command_and_wait("FORWARD 0")
-            numBoxes -= 1
-            bottomFull = False
-            if numBoxes > 0:
-                send_command_and_wait("LIFT DOWN")
-                bottomFull = True
+    if bottomFull:
+        send_command_and_wait("EXCHANGE OUT")
+        send_command_and_wait("BACK 100")
+        time.sleep(1.5)
+        send_command_and_wait("FORWARD 0")
+        numBoxes -= 1
+        bottomFull = False
+        send_command_and_wait("LIFT DOWN")
+        bottomFull = True
 
         
     
@@ -107,6 +96,9 @@ while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
+        elif event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_q:  # Check if 'q' key is pressed
+                running = False
         elif event.type == pygame.JOYBUTTONDOWN:
             if joystick.get_button(0):  # A button
                 button_a_action()
@@ -120,7 +112,9 @@ while running:
             # Assuming axis 0 is the x-axis and axis 1 is the y-axis of the left joystick
             x_axis = joystick.get_axis(0)
             y_axis = joystick.get_axis(1)
-            travel_command(x_axis, y_axis)
+            deadzone = 0.1  # Define a deadzone threshold
+            if abs(x_axis) > deadzone or abs(y_axis) > deadzone:
+                travel_command(x_axis, y_axis)
 
 # Quit Pygame
 pygame.quit()
