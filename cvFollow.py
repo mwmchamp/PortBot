@@ -1,6 +1,7 @@
+import imp
 from ultralytics import YOLO
 import cv2
-import os
+from osc import CAM
 
 # Load a model
 # model = YOLO("yolo11n.pt")  # load an official model
@@ -25,7 +26,7 @@ def process_image(input_source, model, is_webcam=False):
 
 if use_webcam:
     # Open the webcam
-    cap = cv2.VideoCapture("/dev/video0")
+    cap = cv2.VideoCapture(CAM)
     if not cap.isOpened():
         print("Error: Cannot access the camera.")
         exit()
