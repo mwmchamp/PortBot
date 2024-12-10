@@ -23,16 +23,15 @@ joystick.init()
 uart = Serial(port=PORT, baudrate=115200)  # Adjust the port and baud rate as needed
 
 def send_command_and_wait(command):
-    uart.write(command)
+    uart.write((command+'\n').encode('utf-8'))
     print(f"sent {command}")
     # Block other commands until '1' is received over UART
     while True:
-        print(uart.in_waiting)
         if uart.in_waiting > 0:
             print("Fuck you")
             response = uart.read()
             print(response)
-            if response == b'1':
+            if response == '1':
                 break
     print("Request completed")
 
@@ -70,8 +69,8 @@ def button_x_action():
     print("Button X pressed")
     if numBoxes < 3:
         if bottomFull:
-            send_command_and_wait(b"LIFT UP")
-        send_command_and_wait(b"EXCHANGE IN")
+            send_command_and_wait("LIFT UP")
+        send_command_and_wait("EXCHANGE IN")
         bottomFull = True
         numBoxes += 1
 
@@ -80,14 +79,14 @@ def button_y_action():
     print("Button Y pressed")
     if numBoxes > 0:
         if bottomFull:
-            send_command_and_wait(b"EXCHANGE OUT")
-            send_command_and_wait(b"BACK 100")
+            send_command_and_wait("EXCHANGE OUT")
+            send_command_and_wait("BACK 100")
             time.sleep(1.5)
-            send_command_and_wait(b"FORWARD 0")
+            send_command_and_wait("FORWARD 0")
             numBoxes -= 1
             bottomFull = False
             if numBoxes > 0:
-                send_command_and_wait(b"LIFT DOWN")
+                send_command_and_wait("LIFT DOWN")
                 bottomFull = True
 
         
