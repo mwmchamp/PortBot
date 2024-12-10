@@ -3,7 +3,7 @@ import os
 import time
 
 # Set up the output directory
-output_dir = "pain"
+output_dir = "allBoxes"
 os.makedirs(output_dir, exist_ok=True)
 
 # Open the webcam
