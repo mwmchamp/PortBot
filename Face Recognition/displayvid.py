@@ -16,12 +16,22 @@ def display_video():
     # Continuously capture frames from the camera
     while True:
         # Read a frame from the video capture
-        ret, frame = cap.read()
+        try:
+            ret, frame = cap.read()
+            print("read")
+            if ret:
+                print("Frame read successfully.")
+        except Exception as e:
+            print(f"An error occurred while reading a frame: {e}")
+            ret, frame = False, None
 
         # If a frame is successfully captured
         if ret:
             # Display the frame in a window named 'Video'
-            cv2.imshow('Video', frame)
+            try:
+                cv2.imshow('Video', frame)
+            except Exception as e:
+                print(f"An error occurred while displaying the frame: {e}")
 
             # Break the loop if 'q' is pressed
             if cv2.waitKey(1) & 0xFF == ord('q'):
