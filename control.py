@@ -23,17 +23,22 @@ joystick.init()
 uart = Serial(port=PORT, baudrate=115200)  # Adjust the port and baud rate as needed
 
 def send_command_and_wait(command):
-    uart.write((command+'\n').encode('utf-8'))
-    print(f"sent {command}")
-    # Block other commands until '1' is received over UART
+    uart.write(command.encode()+b'\n')
+    print(f"Sent: {command}")
+
     while True:
         if uart.in_waiting > 0:
-            print("Fuck you")
             response = uart.read()
-            print(response)
-            if response == '1':
+            print(f"{response.decode()}", end="")
+            if response in (b'1', b'0'):
                 break
-    print("Request completed")
+    print("")
+    if response == b'1':
+        print(command, "successful\n")
+        return 0
+    else:
+        print(command, "failed\n")
+        return 1
 
 def travel_command(x, y):
     # Define a deadzone threshold
@@ -46,15 +51,15 @@ def travel_command(x, y):
         y = 0
 
     if y >= 0:
-        send_command_and_wait(f"FORWARD {y}".encode())
+        send_command_and_wait(f"FORWARD {y}")
     else:
-        send_command_and_wait(f"BACK {-y}".encode())
+        send_command_and_wait(f"BACK {-y}")
 
     # Map x from -1 to 1 to 90 to 150
     x_mapped = 90 + ((x + 1) / 2) * (150 - 90)
     
     # Send the STEER command with the mapped x value
-    send_command_and_wait(f"STEER {x_mapped}".encode())
+    send_command_and_wait(f"STEER {x_mapped}")
 
     print(f"Travel command with x: {x}, y: {-y}")
 
