@@ -26,12 +26,16 @@ def send_command_and_wait(command):
     uart.write(command.encode()+b'\n')
     print(f"Sent: {command}")
 
+    start_time = time.time()
     while True:
         if uart.in_waiting > 0:
             response = uart.read()
             print(f"{response.decode()}", end="")
             if response in (b'1', b'0'):
                 break
+        if time.time() - start_time > 3:
+            print("Timeout: No response received within 3 seconds")
+            return 1
     print("")
     if response == b'1':
         print(command, "successful\n")
