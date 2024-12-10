@@ -1,45 +1,79 @@
-import cv2
 from ultralytics import YOLO
+import cv2
+import os
 
-# Load the trained YOLOv8 model (best.pt)
-model = YOLO('best.pt')  # Replace with the path to your model
+# Load a model
+# model = YOLO("yolo11n.pt")  # load an official model
+model = YOLO("bestAll.pt")  # load a custom model
 
-# Open the webcam (you can change the index if using multiple cameras)
-cap = cv2.VideoCapture(0)  # Use 0 for the default webcam
+use_webcam = True
 
-# Set the desired frame width and height for processing
-cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
-cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
+# Directory containing images
+image_dir = "/Users/mwmchamp/Library/CloudStorage/OneDrive-PrincetonUniversity/Semester5/CarLab/PortBot/test/images"
 
-while True:
-    # Capture frame-by-frame
-    ret, frame = cap.read()
-    
-    if not ret:
-        break  # Exit if no frame is read
-    
-    # Run inference on the current frame
-    results = model(frame)
+def process_image(input_source, model, is_webcam=False):
+    # Predict with the model
+    if is_webcam:
+        results = model(input_source)  # predict on a frame
+    else:
+        results = model(input_source)  # predict on an image
+    print(results)
+    return results
 
-    # Iterate over the results
-    for result in results:
-        # Extract boxes from the result
-        boxes = result.boxes  # Use the correct attribute
-        if boxes is not None:
-            for box in boxes:
-                x1, y1, w, h, conf, cls = map(int, box.xywh)  # Assuming box has an xywh method or property
-                # Draw bounding boxes
-                cv2.rectangle(frame, (x1, y1), (x1+w, y1+h), (0, 255, 0), 2)
-                cv2.putText(frame, f"Class {cls} Conf {conf:.2f}", 
-                            (x1, y1-10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
-    
-    # Show the resulting frame with detections
-    cv2.imshow('YOLOv8 Object Detection', frame)
+# Check if the input source is a webcam or directory
+  # Set to True to use webcam
 
-    # Exit the loop if 'q' is pressed
-    if cv2.waitKey(1) & 0xFF == ord('q'):
-        break
+if use_webcam:
+    # Open the webcam
+    cap = cv2.VideoCapture(0)
+    if not cap.isOpened():
+        print("Error: Cannot access the camera.")
+        exit()
 
-# Release the capture and close OpenCV windows
-cap.release()
+    while True:
+        # Capture a frame
+        ret, frame = cap.read()
+        if not ret:
+            print("Error: Cannot read frame.")
+            break
+
+        # Get results from the function
+        results = process_image(frame, model, is_webcam=True)
+
+        # Assuming 'results' is a list of detections, iterate over them
+        for result in results:
+            # Get the image with the bounding boxes and labels drawn
+            annotated_frame = result.plot()
+
+            # Display the image using OpenCV
+            cv2.imshow("Detection Results", annotated_frame)
+
+        # Exit on 'q' key
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            break
+
+    # Release resources
+    cap.release()
+else:
+    # Iterate through the images in the directory
+    for image_name in os.listdir(image_dir):
+        if image_name.endswith(('.jpg', '.jpeg', '.png')):  # Check for image files
+            image_path = os.path.join(image_dir, image_name)
+            
+            # Get results from the function
+            results = process_image(image_path, model)
+
+            # Assuming 'results' is a list of detections, iterate over them
+            for result in results:
+                # Get the image with the bounding boxes and labels drawn
+                annotated_frame = result.plot()
+
+                # Display the image using OpenCV
+                cv2.imshow("Detection Results", annotated_frame)
+
+                # Wait for a key press to close the window
+                cv2.waitKey(0)
+
+# Close all OpenCV windows
 cv2.destroyAllWindows()
+
