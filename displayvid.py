@@ -1,0 +1,33 @@
+import cv2
+
+def display_video():
+    # Initialize video capture with the default camera
+    cap = cv2.VideoCapture(0)
+
+    # Set the width and height of the video capture
+    cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
+    cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
+
+    # Continuously capture frames from the camera
+    while True:
+        # Read a frame from the video capture
+        ret, frame = cap.read()
+
+        # If a frame is successfully captured
+        if ret:
+            # Display the frame in a window named 'Video'
+            cv2.imshow('Video', frame)
+
+            # Break the loop if 'q' is pressed
+            if cv2.waitKey(1) & 0xFF == ord('q'):
+                break
+        else:
+            print("Failed to capture video")
+            break
+
+    # Release the video capture object and close all OpenCV windows
+    cap.release()
+    cv2.destroyAllWindows()
+
+if __name__ == "__main__":
+    display_video()
