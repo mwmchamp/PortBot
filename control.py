@@ -27,8 +27,11 @@ def send_command_and_wait(command):
     print(f"sent {command}")
     # Block other commands until '1' is received over UART
     while True:
+        print(uart.in_waiting)
         if uart.in_waiting > 0:
+            print("Fuck you")
             response = uart.read()
+            print(response)
             if response == b'1':
                 break
     print("Request completed")
