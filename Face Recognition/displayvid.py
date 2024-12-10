@@ -2,7 +2,12 @@ import cv2
 
 def display_video():
     # Initialize video capture with the default camera
-    cap = cv2.VideoCapture(0)
+    try:
+        cap = cv2.VideoCapture(0)
+        print("Video capture initialized successfully.")
+    except Exception as e:
+        print(f"An error occurred while initializing video capture: {e}")
+        return
 
     # Set the width and height of the video capture
     cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
