@@ -28,9 +28,6 @@ def display_video():
         # If a frame is successfully captured
         # Display the frame in a window named 'Video'
         try:
-            if not ret:
-                print("Failed to capture video")
-                break
             cv2.imshow('Video', frame)
         except Exception as e:
             print(f"An error occurred while displaying the frame: {e}")
@@ -38,6 +35,9 @@ def display_video():
         # Break the loop if 'q' is pressed
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
+
+        print("Failed to capture video")
+        break
 
     # Release the video capture object and close all OpenCV windows
     cap.release()
