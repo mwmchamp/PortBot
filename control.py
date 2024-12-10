@@ -85,7 +85,10 @@ def button_a_action():
 
 def button_b_action():
     print("Button B pressed")
-    send_command_and_wait("TRACK BLACK")
+    print("Button B pressed")
+    pygame.mixer.init()
+    pygame.mixer.music.load("OIOIOI.mp3")
+    pygame.mixer.music.play()
 
 def button_x_action():
     global bottomFull
